@@ -1,149 +1,42 @@
-# QG-Net
-QG-Net is a data-driven question generation model that found
-some success generating questions on educational content
-such as textbooks. This repository contains code used in the 
-following publication:
+## Query Training
+### Confirm Execution of Queries as Models
+MULTIVAC will accept properly formatted queries, parse them into compatible formats and match their components to relevant nodes and clusters in its MLN knowledge base to produce answers for those queries. This functionality will be tested and refined in several ways, first using queries auto-extracted from the source texts and then with human expert review. 
 
-Z. Wang, A. S. Lan, W. Nie, P. Grimaldi, A. E. Waters, 
-and R. G. Baraniuk. 
-QG-Net: A Data-Driven Question Generation Model 
-for Educational Content. 
-_ACM Conference on Learning at Scale (L@S)_, 
-June 2018, to appear 
+MULTIVAC will extract literal expert queries, identified by parsing full texts into component sentences and selecting sentences that end in question marks, as well as deriving expert queries from abstracts using a modified version of deep learning query-generation system QG-Net.<sup>[1](#1)</sup>  QG-Net is a recurrent neural network (RNN)-based model that takes as inputs a “context” (typically a limited amount of natural language text containing relevant information) and an “answer” (a specific fact or figure found within the context) and outputs a question tailored to produce that answer. Our adaptation of QG-Net will be written in Python, in line with the current implementation and the rest of the MULTIVAC system.
 
-<a href="url"><img src="https://rice.box.com/shared/static/4cjcwz25j4bll93j4wqdje06whaoez21.png" align="middle" height="50%" width="50%" ></a>
-*Illustration of QG-Net*
+MULTIVAC supplies article abstracts from the metadata file saved from the initial datastore acquisition. These abstracts serve as the “context” data, and MULTIVAC will select parts of the abstracts as the “answer” data. These parts will be selected based on two heuristics:
+* Words that occur in the same context (sentence or paragraph) as model parameters and descriptions in the main body of the article or that occur in the article title signify phrases that can serve as feasible answers.
+* Words with a high TF-IDF score for a particular article signify phrases that can serve as feasible answers.
 
-The project is built on top of 
-[OpenNMT-py](https://github.com/OpenNMT/OpenNMT-py) 
-and uses part of the code from 
-[DrQA](https://github.com/facebookresearch/DrQA).
+![alt text](https://github.com/GallupGovt/multivac/blob/master/images/qgnet.png 'QG-net schematic')
+<br>Illustration of the QG-net system. Source: https://github.com/moonlightlane/QG-Net
 
-Please note that this is
-merely research code, and that there is no warrenty. 
-Feel free to modify it for your work.  
+Given context and answer inputs, QG-Net generates different questions that focus on the relevant contextual information that different answers provide. More specifically, it uses MULTIVAC’s domain-adapted GloVe embedding model to represent words as vectors coupled with speech tags, name entity flags and word case tags from the initial parsing as inputs in the context reader to generate diverse context word representations. Finally, a question generator generates the question text word-by-word given all context word representations.
+
+The resulting queries are then applied in order to MULTIVAC’s MLN ontology and the resulting answers are compared with the “answer” extracted directly from the source data. Good matches, in the sense of high scores for semantic completeness, lexical similarity and syntactical similarity will indicate good performance of the ontology. These measures will be assessed using approaches including but not necessarily limited to latent semantic analysis and minimal edit distance metrics. 
+
+This process serves an important quality control purpose, but more importantly this round of query generation allows MULTIVAC to bootstrap a training data set for learning how to generate its own queries without direct reference to previously existing research questions or findings. Samples of this training data will be reviewed and vetted by live human experts as a template for the essential inclusion of human expertise in MULTIVAC’s workflow in eventual production versions of the system. These human experts will also test the trained system with their own novel queries. The involvement of human experts in this phase serves two purposes. First, human expert review of the extracted queries and outputs provides a crucial check on system performance and helps identify areas most in need of improvement or optimization. Second, novel queries submitted by actual human experts provides an “out of sample” test for a system trained on a finite corpus.
 
 ### Dependencies
 python3.5 \
 pytorch (only tested on v0.4.1) \
+GPU for computation \
 OpenNMT-py (not tested on the latest version; pls use the version in this repo) \
-Stanford CoreNLP (optional) \
+Stanford CoreNLP download and server \
 torchtext-0.1.1 (this is important; if you use the latest 
 torchtext you might encounter error when preprocessing 
 corpus. Install by the command `pip3 install torchtext-
 0.1.1`, or follow official installation instructions for
 your python distribution.)
 
-### Reproduce the result in the paper
+### Directions to run QG-Net algorithm to generate queries. 
 1. Run the download script to download a pre-trained QG-Net model
 and the test input file: `. download_QG-Net.sh`
 2. Run the script in the `test` folder; first `cd test/`, then
 `. qg_reproduce_LS.sh`
 3. The output file is a text file starting with 
  the prefix `output_questions_`
- 
-If you want to reproduce the results of the baseline models,
-please follow the following procedure similar to the above:
-1. Run the download script to download the pre-trained baseline
-models: `. download_baselines.sh`. The models are stored in 
-the folder `test/models.for.test/`. We provide 2 baseline models:
-LSTM + attention model and QG-Net without linguistic features.
-2. modify the script in the test folder: change the `model` 
-variable in line 10 to another model. The name of the model you 
-entered must match with the name of the models you downloaded in
-the folder `test/models.for.test/`.
-3. First `cd test/` and then run the script `. qg_reproduce_LS.sh`.
 
-
-### Train your own model
-
-##### Get the data
-QG-Net is trained on 
-[SQuAD](https://rajpurkar.github.io/SQuAD-explorer/).
-We provide both the preprocessed SQuAD dataset and the raw 
-SQuAD dataset. 
-- You can use our preprocessed SQuAD dataset if you want to
-avoid the cumbersome data preprocessing steps. To obtain the 
-preprocessed SQuAD data, run the download script 
-`. download_preproc_squad.sh`. The downloaded data, after unzip,
-should contain 3 files with prefix `data.feat.1sent` and suffix
-`train.pt`, `valid.pt` and `vocab.pt`, respectively.
-- You can also download the raw SQuAD dataset if you want to 
-perform data preprocessing on your own. To obtain the raw SQuAD
-data, get into the preprocessing directory `cd preprocessing/`
-and then run the download script `. download_raw_squad.sh`.
-
-
-##### Preprocessing
-If you choose to download our preprocessed SQuAD dataset, you 
-can skip this step. Otherwise, we provide the detailed steps 
-of how we preprocessed SQuAD. If you downloaded the raw SQuAD 
-dataset, you can follow the below procedure to preprocess the
-dataset:
-1. First you need to install Stanford CoreNLP to process
-the dataset. In command line, get into the
-preprocessing directory `cd preprocessing/`, then 
-run the script `. install_corenlp.sh` and follow the default instructions
-for installation. 
-_make sure you have corenlp installed in `data/corenlp/` directory._
-2. Navigate to directory `preprocessing/`, and run 
-`. preproc_squad.sh` in command line. 
-You should be able to run without changing any line in the bash file.
-This file does 3 things: 1) tokenize data using corenlp; 2) train-validation
-data split; and 3) use OpenNMT's preprocess script to process data 
-into the format that the training script takes.
-The processed `.pt` data that QG-Net uses for training will be 
-stored in the `data/` directory.
-It takes about 500 seconds for the processing to finish.
-
-
-##### Trainining
-Navigate to the QG-net directory, and run `. train.sh` in command
-line.
-You should be able to run without changing any line in the bash file.
-Training results will be stored in a newly created 
-`results_$DATE` directory, where `$DATE` is the current date in 
-`year_month_date` format.
-
-##### Generating
-In the `qg.sh` script, modify the variable `dir` in line 10 to be 
-the result directory `results_$DATE` you just created. 
-Then run the script `. qg.sh` to generate questions on the test
-split of SQuAD dataset. 
-
-##### Evaluating
-In the `eval.sh` script, modify the variable `dir` in line 10 to be 
-the result directory `results_$DATE` you just created.
-Then run the script `. eval.sh` to generate questions on the test
-split of SQuAD dataset. Evaluation results will be printed to
-the console.
-
-_Note: Question generation from a piece of text of your choice
-is currently not supported because the process involves burdensome
-preprocessing that is not yet streamlined._
-
-### A bit more about question generation and QG-Net
-We consider question generation as a sequence-to-sequence learning
-problem: the input is a sequence (a piece of context, e.g., a
-sentence or paragraph in a textbook), and the output is also a 
-sequence (a question).
-
-Because several distinct questions can be generated from the same
-context, depending where in the context you want to ask question,
-the input sequence also needs to encode the "answer" information,
-e.g., which part of the input sequence to ask question about.
-
-QG-Net is a RNN-based, sequence-to-sequence model with attention
-mechanism and copy mechanism to improve the generated question 
-quality.
-In particular, attention mechanism allows the model to 
-access the entire history of the input sequence, and copy mechanism
-allows the model to copy words/tokens directly from the input 
-sequence as generated words.
-
-Below is a more elaborate illustration of QG-Net model:
-
-![Illustration of QG-Net](https://rice.box.com/shared/static/9bwiyq2ly84h7rev8xvjdrocnd5v312f.png)
-*Illustration of QG-Net*
-
+### End Notes
+- <sup><a name='1'>1</a></sup> Z. Wang, A. S. Lan, W. Nie, P. Grimaldi, R. Schloss, and R. G. Baraniuk, "QG-Net: A Data-Driven Question Generation Model for Educational Content," ACM Conference on Learning at Scale (L@S), pp. 1-10, June 2018. Full text available at https://people.umass.edu/~andrewlan/papers/18l@s-qgen.pdf <br>
 
