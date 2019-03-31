@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # need to change the model itself, since different folders have different models
+mkdir attention_visualizations_LSTM_attn
 nbest=10
 num_sent=1
 beam_size=15
@@ -12,7 +13,7 @@ model="QG-Net.pt"
 alpha=0.2
 beta=0.2
 
-python3 ../OpenNMT-py/generate.py \
+python3.6 ../OpenNMT-py/generate.py \
 -model $model_dir/$model \
 -src input.for.test/input.txt \
 -output output_questions_$model.txt \
