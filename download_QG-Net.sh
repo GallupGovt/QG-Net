@@ -20,4 +20,7 @@ cd ../../
 
 echo "download completed."
 
-
+# Create input file for QG-Net model
+cd test
+cd input.for.test
+python3 preprocessing_pdf.py > input.txt 
