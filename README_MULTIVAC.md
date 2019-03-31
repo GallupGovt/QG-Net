@@ -21,7 +21,7 @@ MULTIVAC effort. For more in general on MULTIVAC, please visit the primary
 MULTIVAC derives queries from text using a modified version of the deep
 learning query generation system (QG-Net). QG-Net is a recurrent neural network
 (RNN)-based model that takes as inputs a "context" (typically a limited amount
-of natural language text containing relevant information)and an "answer" (a
+of natural language text containing relevant information) and an "answer" (a
 specific fact or figure found within the context) and outputs a question
 tailored to produce that answer. For MULTIVAC, we provided epidemiology
 research abstracts to the QG-Net context reader. The abstract is the section
@@ -61,7 +61,7 @@ queries based on epidemiology research abstracts scraped and processed as
 earlier steps in MULTIVAC.
 
 ## Dependencies
-To run QG-Net, there are a number of dependencies above and beyond those required for MULTIVAC. Primary among them is the need for a GPU-based system for computation of the RNN. In addition to the GPU, the following are core requirements:
+To run QG-Net, there are a number of dependencies above and beyond those required for MULTIVAC. Primary among them is the need for a GPU-based system (currently tested against a Nvidia Quadro Pro-4000 card) for computation of the RNN. In addition to the GPU, the following are core requirements:
 - GPU for computation
 - Python 3.6
 - pytorch-0.4.1
