@@ -1,26 +1,17 @@
 #!/bin/bash
-
 # Configure download location
-
-# first download the QG-Net model
-DOWNLOAD_PATH="test/models.for.test/"
+DOWNLOAD_PATH="$1/test/input.for.test"
 mkdir -p $DOWNLOAD_PATH
 
 # Download the test files
-mkdir data/
-cd data/
+mkdir "$1"/data/
+cd "$1"/data/
 wget -v -O test.tar.gz -L https://rice.box.com/shared/static/o8hw9zyzm1391blwtm8lx6c38qu9shck.gz
 tar -xvf test.tar.gz
-cd ../
 
 # Download qg-net
 cd $DOWNLOAD_PATH
 wget -v -O QG-Net.pt -L https://rice.box.com/shared/static/izhz3hasup6ekgi8jwyokt70btdq5z3j.pt
-cd ../../
+mv $DOWNLOAD_PATH/*.pt $DOWNLOAD_PATH/QG-Net.pt
 
 echo "download completed."
-
-# Create input file for QG-Net model
-cd test
-cd input.for.test
-python3 preprocessing_pdf.py > input.txt 
