@@ -90,7 +90,7 @@ def preprocess_pdf(abstract, features, tfidf, nlp, num_sentences=5):
                                                    token['ner'], ans)
 
         if '￨A' in out_str:
-            output_vec.append(out_str)
+            output_vec.append(out_str[:-1])
 
     with open('{}/test/input.for.test/input.txt'.format(settings.qgnet_dir),
               'w') as f:
