@@ -68,6 +68,7 @@ To run QG-Net, there are a number of dependencies above and beyond those require
 - OpenNMT-py (note, the version of OpenNMT-py in the original QG-Net is necessary for execution; not tested with MIT's version of OpenNMT)
 - [Stanford CoreNLP server](https://stanfordnlp.github.io/CoreNLP/#download)
 - torchtext-0.1.1
+- [DrQA] (https://github.com/facebookresearch/DrQA)
 
 ## Directions to run QG-Net as a stand-alone application for MULTIVAC
 1.  Clone the [QG-Net repository on GallupGovt](https://github.com/GallupGovt/qgnet) to implement QG-Net within the MULTIVAC system.
