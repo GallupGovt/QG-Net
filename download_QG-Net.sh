@@ -1,6 +1,6 @@
 #!/bin/bash
 # Configure download location
-DOWNLOAD_PATH="$1/test/input.for.test"
+DOWNLOAD_PATH="$1/test/testinput"
 mkdir -p $DOWNLOAD_PATH
 
 # Download the test files

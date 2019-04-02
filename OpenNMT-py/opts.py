@@ -432,7 +432,7 @@ def DrQA_opts(parser):
                         default='DrQA/data/reader/single.mdl',
                         help='Path to model to use')
     parser.add_argument('-embedding-file', type=str,
-                        default='/home/domonique_hodge/qgnet_folder/QG-Net/test/Domain_Adapted_GloVe.txt',
+                        default='models_dir/da_embeddings.txt',
                         help=('Expand dictionary to use all pretrained '
                               'embeddings in this file.'))
     parser.add_argument('-out-dir', type=str, default='/tmp',
